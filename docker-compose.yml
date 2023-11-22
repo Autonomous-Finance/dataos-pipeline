@@ -1,0 +1,15 @@
+version: '3.8'
+services:
+  prefect:
+    build: .
+    volumes:
+      - ./flows:/opt/prefect/flows
+      - ./deployments.py:/opt/prefect/deployments.py
+    environment:
+      PREFECT_API_URL: https://api.prefect.cloud/api/accounts/734986ce-6773-48e8-82b8-3a3d0b504278/workspaces/cb2e791d-2ca6-4697-9dce-41e4a329ad3f
+      PREFECT_API_KEY: pnu_wYaf5vRjvGEKUB8mKhHpwBkdUq1Vt23BD65M
+      CLICKHOUSE_HOST: '116.202.175.253'
+      CLICKHOUSE_PORT: '9000'
+      CLICKHOUSE_USER: 'default'
+      CLICKHOUSE_PASSWORD: 'ALAb~deopY8SU'
+      CLICKHOUSE_DB: 'dataos_explore'
