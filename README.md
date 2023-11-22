@@ -1,0 +1,7 @@
+# dataos-pipeline
+
+```
+pipenv install
+python deployments.py
+click buttons on https://app.prefect.cloud/account/734986ce-6773-48e8-82b8-3a3d0b504278/workspace/cb2e791d-2ca6-4697-9dce-41e4a329ad3f/deployments
+```
