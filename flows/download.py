@@ -86,6 +86,9 @@ async def download_files(ids):
         print(f"Successful downloads: {len(successful_downloads)}")
         print(f"Failed downloads: {len(failed_downloads)}")
 
+        if len(failed_downloads) > len(successful_downloads):
+            raise Exception("too many failures")
+
 # Define the Prefect flow
 @flow(name="Download and Save Files", log_prints=True)
 async def fetch_files_from_arweave(base_table='dataos_relevant_tx_mirror_paragraph'):
