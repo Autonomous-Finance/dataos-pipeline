@@ -48,12 +48,13 @@ async def get_file_ids(base_table):
 
 async def fetch_file(client, gateway_url, file_id):
     try:
-        print("trying ", f"{gateway_url}{file_id}")
+        # print("trying ", f"{gateway_url}{file_id}")
         response = await client.get(f"{gateway_url}{file_id}", timeout=15, follow_redirects=True)
         if response.status_code == 200:
             return (file_id, response.text, datetime.now())
     except (httpx.HTTPError, httpx.NetworkError) as e:
-        print(f"Error for URL {gateway_url}{file_id}: {e}")
+        pass
+        # print(f"Error for URL {gateway_url}{file_id}: {e}")
     return (file_id, None, datetime.now())
 
 @task
