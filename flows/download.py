@@ -6,6 +6,7 @@ from itertools import cycle
 import os
 import random
 import asyncio
+from traceback import print_exc
 import ssl
 
 
@@ -52,7 +53,8 @@ async def fetch_file(client, gateway_url, file_id):
         response = await client.get(f"{gateway_url}{file_id}", timeout=15, follow_redirects=True)
         if response.status_code == 200:
             return (file_id, response.text, datetime.now())
-    except (httpx.HTTPError, httpx.NetworkError) as e:
+    except Exception as e:
+        print_exc()
         pass
         # print(f"Error for URL {gateway_url}{file_id}: {e}")
     return (file_id, None, datetime.now())
