@@ -54,9 +54,8 @@ async def fetch_file(client, gateway_url, file_id):
         if response.status_code == 200:
             return (file_id, response.text, datetime.now())
     except Exception as e:
-        print_exc()
         pass
-        # print(f"Error for URL {gateway_url}{file_id}: {e}")
+        #print(f"Error for URL {gateway_url}{file_id}: {e}")
     return (file_id, None, datetime.now())
 
 @task
