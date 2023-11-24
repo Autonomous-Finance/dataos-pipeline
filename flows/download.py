@@ -1,13 +1,10 @@
 from prefect import task, flow
 import httpx
-from clickhouse_driver import Client
 from datetime import datetime
+from util.clickhouse import get_clickhouse_connection
 from itertools import cycle
-import os
 import random
 import asyncio
-from traceback import print_exc
-import ssl
 
 
 def get_ario_gateways():
@@ -25,17 +22,15 @@ ARIO_GATEWAYS = get_ario_gateways()
 GATEWAYS = list(set(BASE_GATEWAYS + ARIO_GATEWAYS))
 random.shuffle(GATEWAYS)
 
-clickhouse_client = Client(host=os.environ['CLICKHOUSE_HOST'], port=os.environ['CLICKHOUSE_PORT'],
-                user=os.environ['CLICKHOUSE_USER'], password=os.environ['CLICKHOUSE_PASSWORD'],
-                database=os.environ['CLICKHOUSE_DB'])
+clickhouse_client = get_clickhouse_connection()
 
 @task
 async def get_file_ids(base_table):
     query = f"""
     WITH q AS (
         SELECT id
-        FROM dataos_explore.dataos_relevant_tx_mirror_paragraph
-        LEFT JOIN dataos_explore.files f USING (id)
+        FROM dataos_explore.dataos_relevant_tx_lens
+        LEFT JOIN dataos_explore.files_lens f USING (id)
         WHERE f.content = ''
         LIMIT 10000
     )
@@ -77,7 +72,7 @@ async def download_files(ids):
 
         # Insert successful results into the database
         if successful_downloads:
-            query = "INSERT INTO dataos_explore.files (id, content, retrieved_at) VALUES"
+            query = "INSERT INTO dataos_explore.files_lens (id, content, retrieved_at) VALUES"
             clickhouse_client.execute(query, successful_downloads)
             print(f"Saved {len(successful_downloads)} files.")
 
