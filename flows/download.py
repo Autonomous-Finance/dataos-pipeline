@@ -30,8 +30,7 @@ async def get_file_ids(base_table):
     WITH q AS (
         SELECT id
         FROM dataos_explore.dataos_relevant_tx_lens
-        LEFT JOIN dataos_explore.files_lens f USING (id)
-        WHERE f.content = ''
+        ANTI JOIN dataos_explore.files_lens f USING (id)
         LIMIT 10000
     )
     SELECT *
