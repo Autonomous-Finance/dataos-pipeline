@@ -1,1 +1,2 @@
 from .download import fetch_files_from_arweave
+from .spacy_entities_generation import generate_entities
