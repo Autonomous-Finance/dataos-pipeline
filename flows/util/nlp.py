@@ -8,6 +8,8 @@ from nltk.corpus import words as nltk_words
 from thefuzz import fuzz
 from thefuzz import process
 import numpy as np
+from transformers import AutoTokenizer, AutoModelForTokenClassification
+from transformers import pipeline
 
 
 os.system("python3 -m spacy download en_core_web_sm --quiet")
@@ -48,7 +50,7 @@ def eng_quality_ratio(text: str) -> float:
     return quality_ratio
 
 
-ENT_TYPES = [
+ENT_TYPES = (
     'PERSON',
     'NORP',
     'FAC',
@@ -60,7 +62,7 @@ ENT_TYPES = [
     'WORK_OF_ART',
     'LAW',
     'LANGUAGE'
-]
+)
 
 
 def extract_spacy_entities(text: str, ent_types=ENT_TYPES) -> dict[list]:
@@ -87,3 +89,4 @@ def match_keywords(words_1: list[str], words_2: list[str], fuzz_treshold: int = 
 
 def cosine_similarity(a, b) -> float:
     return np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b))
+

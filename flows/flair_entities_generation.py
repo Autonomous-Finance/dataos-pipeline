@@ -1,4 +1,3 @@
-import os
 from datetime import datetime
 
 from prefect import task, flow
@@ -7,14 +6,15 @@ import pandas as pd
 
 from util.clickhouse import get_ch_client
 from util.common import load_env
-from util.nlp import eng_quality_ratio, extract_spacy_entities
+from util.nlp import eng_quality_ratio
+from util.flair_ner import extract_flair_18c_entities
 
 
 text_max_chars = 100000
 
 
 @task
-def generate_spacy_entities(num_records=300):
+def generate_flair_entities(num_records=300):
 
     target_quality_ratio = 0.3
     ts = datetime.now()
@@ -22,7 +22,7 @@ def generate_spacy_entities(num_records=300):
     query = f"""
     SELECT t.content, content_id
     FROM dataos_explore.content_mirrorxyz t
-    where t.content_id NOT IN (SELECT document_id FROM dataos_explore.spacy_entities)
+    where t.content_id NOT IN (SELECT document_id FROM dataos_explore.flair_entities)
     and t.content_id NOT IN (SELECT document_id FROM dataos_explore.eng_data_quality where quality_score < {target_quality_ratio} )
     and length(content) > 70
     and length(splitByChar(' ', t.content)) > 10
@@ -68,7 +68,7 @@ def generate_spacy_entities(num_records=300):
 
     for n in range(len(clean_texts)):
         text = clean_texts[n]['text']
-        entities = extract_spacy_entities(text)
+        entities = extract_flair_18c_entities(text)
         clean_texts[n]['entities'] = entities
 
     clean_texts_df = pd.DataFrame(clean_texts)
@@ -79,17 +79,24 @@ def generate_spacy_entities(num_records=300):
     column_names = [
         'document_id',
         'created_at',
-        'person_entities',
-        'norp_entities',
-        'fac_entities',
-        'org_entities',
-        'gpe_entities',
-        'loc_entities',
-        'product_entities',
+        'cardinal_entities',
+        'date_entities',
         'event_entities',
-        'work_of_art_entities',
-        'law_entities',
+        'fac_entities',
+        'gpe_entities',
         'language_entities',
+        'law_entities',
+        'loc_entities',
+        'money_entities',
+        'norp_entities',
+        'ordinal_entities',
+        'org_entities',
+        'percent_entities',
+        'person_entities',
+        'product_entities',
+        'quantity_entities',
+        'time_entities',
+        'work_of_art_entities',
     ]
 
     res_list = []
@@ -112,21 +119,21 @@ def generate_spacy_entities(num_records=300):
     rows = list(res_df[column_names].itertuples(index=False, name=None))
 
     client.insert(
-        'dataos_explore.spacy_entities',
+        'dataos_explore.flair_entities',
         rows,
         column_names=column_names
     )
 
 
-@flow(name="Generate spacy entities", log_prints=True)
+@flow(name="Generate flair entities", log_prints=True)
 def generate_entities():
-    generate_spacy_entities()
+    generate_flair_entities()
 
 
 if __name__ == "__main__":
     load_env()
     generate_entities_deploy = generate_entities.to_deployment(
-        name=os.environ['DEPLOYMENT_NAME'],
+        name='matvei-local-flair-entities',
         cron="*/45 * * * *"
     )
     serve(generate_entities_deploy)
