@@ -74,10 +74,11 @@ async def download_files(files):
             else:
                 failed_downloads.append(result)
 
+        print("download finished")
         # Insert successful results into the database
         if successful_downloads:
             query = "INSERT INTO dataos_explore.file_cache (id, created_at_dt, created_at, content, retrieved_at) VALUES"
-            settings = {"async_insert": 1, "async_insert_deduplicate": 1}
+            settings = {"async_insert": 1, "async_insert_deduplicate": 0}
             clickhouse_client.execute(query, successful_downloads, settings=settings)
             print(f"Saved {len(successful_downloads)} files.")
 
