@@ -89,7 +89,7 @@ async def download_files(files):
 @task
 def insert_to_clickhouse(successful_downloads):
     query = "INSERT INTO dataos_explore.file_cache (id, created_at_dt, created_at, content, retrieved_at) VALUES"
-    settings = {"async_insert": 1, "async_insert_deduplicate": 0}
+    settings = {} # "async_insert": 1, "async_insert_deduplicate": 0
     clickhouse_client.execute(query, successful_downloads, settings=settings)
     print(f"Saved {len(successful_downloads)} files.")
 
