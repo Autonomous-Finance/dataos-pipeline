@@ -76,11 +76,6 @@ async def download_files(files):
 
         print("download finished")
         # Insert successful results into the database
-        if successful_downloads:
-            query = "INSERT INTO dataos_explore.file_cache (id, created_at_dt, created_at, content, retrieved_at) VALUES"
-            settings = {"async_insert": 1, "async_insert_deduplicate": 0}
-            clickhouse_client.execute(query, successful_downloads, settings=settings)
-            print(f"Saved {len(successful_downloads)} files.")
 
         # Print statistics
         print(f"Total requests: {len(files)}")
@@ -89,12 +84,22 @@ async def download_files(files):
 
         if len(failed_downloads) > len(successful_downloads):
             raise Exception("too many failures")
+        return successful_downloads
+
+@task
+def insert_to_clickhouse(successful_downloads):
+    query = "INSERT INTO dataos_explore.file_cache (id, created_at_dt, created_at, content, retrieved_at) VALUES"
+    settings = {"async_insert": 1, "async_insert_deduplicate": 0}
+    clickhouse_client.execute(query, successful_downloads, settings=settings)
+    print(f"Saved {len(successful_downloads)} files.")
+
 
 # Define the Prefect flow
 @flow(name="Download and Save Files", log_prints=True)
 async def fetch_files_from_arweave(base_table='dataos_relevant_tx_mirror_paragraph'):
     ids = await get_file_ids(base_table)
-    await download_files(ids)
+    successful_files = await download_files(ids)
+    insert_to_clickhouse(successful_files)
 
 if __name__ == "__main__":
     # Create and serve the deployment
