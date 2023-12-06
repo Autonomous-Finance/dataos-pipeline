@@ -36,7 +36,7 @@ async def get_file_ids(base_table):
     SELECT DISTINCT id, created_at_dt, created_at
     FROM q
     ORDER BY randCanonical()
-    LIMIT 3000;
+    LIMIT 1000;
     """
     result = clickhouse_client.execute(query)
     return [row for row in result]
