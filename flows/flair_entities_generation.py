@@ -1,4 +1,5 @@
 from datetime import datetime
+import os
 
 from prefect import task, flow
 from prefect import serve
@@ -133,7 +134,7 @@ def generate_entities():
 if __name__ == "__main__":
     load_env()
     generate_entities_deploy = generate_entities.to_deployment(
-        name='matvei-local-flair-entities',
+        name=f"{os.environ['DEPLOYMENT_NAME']}-flair-entities",
         cron="*/45 * * * *"
     )
     serve(generate_entities_deploy)
