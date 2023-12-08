@@ -134,7 +134,7 @@ def generate_entities():
 if __name__ == "__main__":
     load_env()
     generate_entities_deploy = generate_entities.to_deployment(
-        name=f"{os.environ['DEPLOYMENT_NAME']}-flair-entities",
+        name=f"{os.environ['DEPLOYMENT_NAME']}",
         cron="*/45 * * * *"
     )
     serve(generate_entities_deploy)
