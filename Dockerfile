@@ -6,8 +6,8 @@ COPY requirements.txt .
 RUN pip install -r requirements.txt --trusted-host pypi.python.org --no-cache-dir
 
 # Add our flow code to the image
-#COPY flows /opt/prefect/flows
-#COPY deployments.py /opt/prefect
+COPY flows /opt/prefect/flows
+COPY deployments.py /opt/prefect
 
 # Run our flow script when the container starts
 CMD ["python", "deployments.py"]
