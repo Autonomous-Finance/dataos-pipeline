@@ -16,7 +16,7 @@ from util.openai import generate_text_style, generate_text_title, generate_text_
 
 
 @task
-def generate_metadata(num_records=20):
+def generate_metadata(num_records=40):
 
     query = f"""
     select se.document_id as document_id,
@@ -108,7 +108,7 @@ def generate_metadata(num_records=20):
 
     result_df['content_top_categories'] = result_df['content_categories'].apply(
         lambda x: ','.join(flatten_bart_categories(x)))
-    result_df['keywords'] = result_df['content_categories'].apply(lambda x: ','.join(gen_keybert_kwords(x)))
+    result_df['keywords'] = result_df['content'].apply(lambda x: ','.join(gen_keybert_kwords(x)))
 
     columns = list(result_df.columns)
     rows = list(result_df[columns].itertuples(index=False, name=None))
