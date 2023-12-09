@@ -1,7 +1,7 @@
 from prefect import task, flow
 import httpx
 from datetime import datetime
-from util.clickhouse import get_clickhouse_connection
+from flows.util.clickhouse import get_clickhouse_connection
 from itertools import cycle
 import random
 import asyncio
@@ -28,37 +28,42 @@ clickhouse_client = get_clickhouse_connection()
 async def get_file_ids(base_table):
     query = f"""
     WITH q AS (
-        SELECT id
-        FROM dataos_explore.dataos_relevant_tx_lens
-        ANTI JOIN dataos_explore.files_lens f USING (id)
+        SELECT id, created_at_dt, created_at
+        FROM dataos_explore.indexable
+        ANTI JOIN dataos_explore.file_cache f USING (created_at_dt, id)
         LIMIT 10000
     )
-    SELECT *
+    SELECT DISTINCT id, created_at_dt, created_at
     FROM q
     ORDER BY randCanonical()
-    LIMIT 1000
+    LIMIT 1000;
     """
     result = clickhouse_client.execute(query)
-    return [row[0] for row in result]
+    return [row for row in result]
 
-async def fetch_file(client, gateway_url, file_id):
+async def fetch_file(client, gateway_url, file_id, extra_data):
     try:
         # print("trying ", f"{gateway_url}{file_id}")
         response = await client.get(f"{gateway_url}{file_id}", timeout=15, follow_redirects=True)
         if response.status_code == 200:
-            return (file_id, response.text, datetime.now())
+            return (file_id, extra_data["created_at_dt"], extra_data["created_at"], response.text, datetime.now())
     except Exception as e:
         pass
         #print(f"Error for URL {gateway_url}{file_id}: {e}")
     return (file_id, None, datetime.now())
 
 @task
-async def download_files(ids):
-    print(f"downloading {len(ids)}")
+async def download_files(files):
+    print(f"downloading {len(files)}")
+    gateway_cycle = cycle(GATEWAYS)
     async with httpx.AsyncClient(verify=False) as client:
-        gateway_cycle = cycle(GATEWAYS)
+        jobs = []
+        for file in files:
+            jobs.append(
+                fetch_file(client, next(gateway_cycle), file[0], {"created_at_dt": file[1], "created_at": file[2]})
+            )
         # Use asyncio.gather to run all the fetch operations in parallel
-        results = await asyncio.gather(*(fetch_file(client, next(gateway_cycle), file_id) for file_id in ids))
+        results = await asyncio.gather(*jobs)
 
         successful_downloads = []
         failed_downloads = []
@@ -69,25 +74,32 @@ async def download_files(ids):
             else:
                 failed_downloads.append(result)
 
+        print("download finished")
         # Insert successful results into the database
-        if successful_downloads:
-            query = "INSERT INTO dataos_explore.files_lens (id, content, retrieved_at) VALUES"
-            clickhouse_client.execute(query, successful_downloads)
-            print(f"Saved {len(successful_downloads)} files.")
 
         # Print statistics
-        print(f"Total requests: {len(ids)}")
+        print(f"Total requests: {len(files)}")
         print(f"Successful downloads: {len(successful_downloads)}")
         print(f"Failed downloads: {len(failed_downloads)}")
 
         if len(failed_downloads) > len(successful_downloads):
             raise Exception("too many failures")
+        return successful_downloads
+
+@task
+def insert_to_clickhouse(successful_downloads):
+    query = "INSERT INTO dataos_explore.file_cache (id, created_at_dt, created_at, content, retrieved_at) VALUES"
+    settings = {} # "async_insert": 1, "async_insert_deduplicate": 0
+    clickhouse_client.execute(query, successful_downloads, settings=settings)
+    print(f"Saved {len(successful_downloads)} files.")
+
 
 # Define the Prefect flow
 @flow(name="Download and Save Files", log_prints=True)
 async def fetch_files_from_arweave(base_table='dataos_relevant_tx_mirror_paragraph'):
     ids = await get_file_ids(base_table)
-    await download_files(ids)
+    successful_files = await download_files(ids)
+    insert_to_clickhouse(successful_files)
 
 if __name__ == "__main__":
     # Create and serve the deployment
