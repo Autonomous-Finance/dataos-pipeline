@@ -5,10 +5,10 @@ from prefect import task, flow
 from prefect import serve
 import pandas as pd
 
-from util.clickhouse import get_ch_client
-from util.common import load_env
-from util.nlp import eng_quality_ratio
-from util.flair_ner import extract_flair_18c_entities
+from flows.util.clickhouse import get_ch_client
+from flows.util.common import load_env
+from flows.util.nlp import eng_quality_ratio
+from flows.util.flair_ner import extract_flair_18c_entities
 
 
 text_max_chars = 100000
@@ -127,7 +127,7 @@ def generate_flair_entities(num_records=300):
 
 
 @flow(name="Generate flair entities", log_prints=True)
-def generate_entities():
+def generate_flair_entities_flow():
     generate_flair_entities()
 
 

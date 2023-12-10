@@ -1,10 +1,7 @@
 import os
-import re
 
 import spacy
-import nltk
 import spacy_transformers
-from nltk.corpus import words as nltk_words
 from thefuzz import fuzz
 from thefuzz import process
 import numpy as np
@@ -16,38 +13,10 @@ os.system("python3 -m spacy download en_core_web_sm --quiet")
 os.system("python3 -m spacy download en_core_web_trf --quiet")
 
 
-spacy_nlp_sm = spacy.load("en_core_web_sm")
 # spacy_nlp_trf = spacy_nlp_sm
 spacy_nlp_trf = spacy.load("en_core_web_trf")
-nltk.download('words')
 
 
-def clean_all(text: str) -> str:
-    text = re.sub(r'http\S+', ' ', text)
-    text = re.sub("#[A-Za-z0-9_]+", "", text)
-    text = re.sub("[^0-9A-Za-z ]", "", text)
-    text = text.replace('\n', '').replace('\t', '')
-    text = re.sub(' +', ' ', text)
-    text = text.lower()
-    return text
-
-
-def eng_quality_ratio(text: str) -> float:
-    original_len = len(text)
-    if original_len == 0:
-        return 0.0
-
-    text = clean_all(text.lower())
-    doc = spacy_nlp_sm(text)
-
-    valid_words = []
-
-    for token in doc:
-        if token.lemma_ in nltk_words.words():
-            valid_words.append(token.text)
-
-    quality_ratio = len(' '.join(valid_words)) / original_len
-    return quality_ratio
 
 
 ENT_TYPES = (

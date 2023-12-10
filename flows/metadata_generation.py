@@ -5,19 +5,18 @@ from prefect import task, flow
 from prefect import serve
 import pandas as pd
 
-from util.clickhouse import get_ch_client
-from util.common import load_env
+from flows.util.clickhouse import get_ch_client
+from flows.util.common import load_env
 
 load_env()
 
-from util.bart_categories import flatten_bart_categories, gen_bart_categories
-from util.keybert import gen_keybert_kwords
-from util.openai import generate_text_style, generate_text_title, generate_text_summary, get_embeddings
+from flows.util.bart_categories import flatten_bart_categories, gen_bart_categories
+from flows.util.keybert import gen_keybert_kwords
+from flows.util.openai import generate_text_style, generate_text_title, generate_text_summary, get_embeddings
 
 
 @task
 def generate_metadata(num_records=40):
-
     query = f"""
     select se.document_id as document_id,
            cv.body as content,
