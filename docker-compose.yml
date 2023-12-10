@@ -32,3 +32,19 @@ services:
     env_file:
       - .env
     command: prefect agent start --pool "cpu-agents" --limit 1
+  prefect_w5:
+    build: .
+    volumes:
+      - ./flows:/opt/prefect/flows
+      - ./deployments.py:/opt/prefect/deployments.py
+    env_file:
+      - .env
+    command: prefect agent start --pool "cpu-agents" --limit 1
+  prefect_w6:
+    build: .
+    volumes:
+      - ./flows:/opt/prefect/flows
+      - ./deployments.py:/opt/prefect/deployments.py
+    env_file:
+      - .env
+    command: prefect agent start --pool "cpu-agents" --limit 1
