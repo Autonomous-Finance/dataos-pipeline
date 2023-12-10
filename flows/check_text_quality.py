@@ -18,18 +18,12 @@ nltk.download('words')
 def get_documents(from_retrieved_at: datetime, from_created_at: datetime, limit: int = 100) -> pd.DataFrame:
 
     query = f"""
-    WITH q AS (
-        SELECT id, retrieved_at, created_at, body
-        FROM dataos_explore.quality_content q
-        ANTI JOIN dataos_explore.meta_eng_data_quality USING (id)
-        LIMIT 10000
-    )
-    SELECT DISTINCT ON (id) id, retrieved_at, created_at, body
-    FROM q
-    ORDER BY randCanonical()
-    LIMIT {limit};
+    SELECT id, retrieved_at, created_at, body
+    FROM dataos_explore.quality_content q
+    ANTI JOIN dataos_explore.meta_eng_data_quality USING (id)
+    LIMIT 10000;
     """
-    df_docs = client.query_df(query)
+    df_docs = client.query_df(query).sample(limit)
     df_docs['content_short'] = df_docs['body'].str.slice(0, TEXT_MAX_CHARS)
     df_docs['processed_at'] = pd.Timestamp.utcnow()
 

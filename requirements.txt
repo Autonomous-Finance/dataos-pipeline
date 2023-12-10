@@ -119,9 +119,9 @@ pathspec==0.12.0
 pbr==6.0.0
 pendulum==2.1.2
 Pillow==10.1.0
-pipenv==2023.7.23
+pipenv==2023.11.15
 pipenv-to-requirements==0.9.0
-platformdirs==3.11.0
+platformdirs==4.1.0
 pptree==3.1
 prefect==2.14.10
 prefect-docker==0.4.1
@@ -133,7 +133,7 @@ py-spy==0.3.14
 pyasn1==0.5.1
 pyasn1-modules==0.3.0
 pycparser==2.21
-pydantic==1.10.13
+pydantic==2.5.2
 pydantic_core==2.14.5
 Pygments==2.17.2
 pyparsing==3.1.1
@@ -203,7 +203,7 @@ tzlocal==5.2
 ujson==5.8.0
 urllib3==1.26.18
 uvicorn==0.24.0.post1
-virtualenv==20.21.0
+virtualenv==20.25.0
 virtualenv-clone==0.5.7
 wasabi==1.1.2
 wcwidth==0.2.12
