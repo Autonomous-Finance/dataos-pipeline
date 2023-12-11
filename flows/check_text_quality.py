@@ -6,8 +6,6 @@ import pandas as pd
 import re
 from flows.util.clickhouse import get_ch_client
 from datetime import datetime
-from typing import Tuple, List, Dict
-import os
 
 TARGET_QUALITY_RATIO = 0.3
 TEXT_MAX_CHARS = 100000
@@ -37,13 +35,13 @@ def get_documents(from_retrieved_at: datetime, from_created_at: datetime, limit:
 
 
 def clean_all(text: str) -> str:
-    text1 = re.sub(r'http\S+', ' ', text)
-    text2 = re.sub("#[A-Za-z0-9_]+", "", text1)
-    text3 = re.sub("[^0-9A-Za-z ]", "", text2)
-    text4 = text3.replace('\n', '').replace('\t', '')
-    text5 = re.sub(' +', ' ', text4)
-    text6 = text5.lower()
-    return text6
+    text = re.sub(r'http\S+', ' ', text)
+    text = re.sub("#[A-Za-z0-9_]+", "", text)
+    text = re.sub("[^0-9A-Za-z ]", "", text)
+    text = text.replace('\n', '').replace('\t', '')
+    text = re.sub(' +', ' ', text)
+    text = text.lower()
+    return text
 
 
 def get_english_quality_score(text: str, spacy_nlp_sm) -> float:
