@@ -2,11 +2,11 @@
 CREATE TABLE dataos_explore.meta_eng_data_quality
 (
     id String,
-    retrieved_at DateTime,
-    created_at DateTime,
-    processed_at DateTime,
-    eng_quality Float32,
-    content_short String
+    retrieved_at     DateTime,
+    created_at       DateTime,
+    processed_at     DateTime,
+    eng_quality      Float32,
+    content_short    String
 )
 ENGINE ReplacingMergeTree
 ORDER BY (retrieved_at, created_at, id)

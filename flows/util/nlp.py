@@ -13,10 +13,7 @@ os.system("python3 -m spacy download en_core_web_sm --quiet")
 os.system("python3 -m spacy download en_core_web_trf --quiet")
 
 
-# spacy_nlp_trf = spacy_nlp_sm
 spacy_nlp_trf = spacy.load("en_core_web_trf")
-
-
 
 
 ENT_TYPES = (
