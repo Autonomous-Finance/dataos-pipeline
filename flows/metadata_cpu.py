@@ -44,7 +44,6 @@ def generate_entity_metadata(num_records=1000):
 
     ch_client = get_ch_client()
     result_df = ch_client.query_df(query)
-
     result_df['created_at'] = datetime.now()
 
     def process_tags(text):
@@ -125,11 +124,10 @@ def gen_gpt_text_embeddings(df: pd.DataFrame):
 
     df['embedding'] = _get_embeddings(list(df['content'].values))
     df['created_at'] = datetime.now()
-    df_ = df[['id', 'embedding', 'created_at']]
     ch_client = get_ch_client()
     ch_client.insert_df(
         table='meta_text_embeddings',
-        df=df_,
+        df=df[['id', 'embedding', 'created_at']],
         database='dataos_explore'
     )
 
@@ -145,11 +143,10 @@ def gen_text_summary(df: pd.DataFrame):
 
     df['summary'] = df['content'].apply(_generate_text_summary)
     df['created_at'] = datetime.now()
-    df_ = df[['id', 'summary', 'created_at']]
     ch_client = get_ch_client()
     ch_client.insert_df(
         table='meta_text_summary',
-        df=df_,
+        df=df[['id', 'summary', 'created_at']],
         database='dataos_explore'
     )
 
@@ -165,11 +162,10 @@ def gen_text_title(df: pd.DataFrame):
 
     df['title'] = df['content'].apply(_generate_text_title)
     df['created_at'] = datetime.now()
-    df_ = df[['id', 'title', 'created_at']]
     ch_client = get_ch_client()
     ch_client.insert_df(
         table='meta_text_title',
-        df=df_,
+        df=df[['id', 'title', 'created_at']],
         database='dataos_explore'
     )
 
@@ -185,11 +181,10 @@ def gen_text_style(df: pd.DataFrame):
 
     df['style'] = df['content'].apply(generate_text_style)
     df['created_at'] = datetime.now()
-    df_ = df[['id', 'style', 'created_at']]
     ch_client = get_ch_client()
     ch_client.insert_df(
         table='meta_text_style',
-        df=df_,
+        df=df[['id', 'style', 'created_at']],
         database='dataos_explore'
     )
 
