@@ -1,4 +1,4 @@
-<![CDATA[<div align="center">
+<div align="center">
 
 # 📊 DataOS Pipeline
 
@@ -140,7 +140,7 @@ The pipeline leverages [Prefect](https://www.prefect.io/) for orchestration, sup
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/your-org/dataos-pipeline.git
+   git clone https://github.com/Autonomous-Finance/dataos-pipeline.git
    cd dataos-pipeline
    ```
 
@@ -194,7 +194,7 @@ The pipeline leverages [Prefect](https://www.prefect.io/) for orchestration, sup
 docker compose up -d
 
 # Scale workers
-docker compose up -d --scale prefect_w1=4
+docker compose up -d --scale prefect_cpu=4
 ```
 
 ### Deploying Flows
@@ -286,12 +286,3 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## Attribution
 
 Originally developed by **Roark Technology**.
-
----
-
-<div align="center">
-
-
-
-</div>
-]]>
