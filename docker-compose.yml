@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  # CPU-based Prefect worker
+  prefect_cpu:
+    build: .
+    volumes:
+      - ./flows:/opt/prefect/flows
+      - ./deployments.py:/opt/prefect/deployments.py
+    env_file:
+      - .env
+    command: prefect agent start --pool "cpu-agents" --limit 1
+    deploy:
+      mode: replicated
+      replicas: 2
+    restart: unless-stopped
+
+  # GPU-based Prefect worker (requires NVIDIA runtime)
+  # prefect_gpu:
+  #   build: .
+  #   volumes:
+  #     - ./flows:/opt/prefect/flows
+  #     - ./deployments.py:/opt/prefect/deployments.py
+  #   env_file:
+  #     - .env
+  #   command: prefect agent start --pool "gpu-agents" --limit 1
+  #   deploy:
+  #     mode: replicated
+  #     replicas: 1
+  #     resources:
+  #       reservations:
+  #         devices:
+  #           - driver: nvidia
+  #             count: 1
+  #             capabilities: [gpu]
+  #   restart: unless-stopped

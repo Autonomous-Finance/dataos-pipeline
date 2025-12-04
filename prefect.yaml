@@ -1,0 +1,55 @@
+# Prefect configuration for DataOS Pipeline
+# See https://docs.prefect.io/ for more information
+
+name: dataos-pipeline
+prefect-version: 2.14.5
+
+# Build section - configure Docker image builds if needed
+build:
+
+# Push section - configure remote storage for flow code
+push:
+
+# Pull section - configure how to retrieve flow code in remote execution
+pull:
+- prefect.deployments.steps.set_working_directory:
+    directory: /opt/prefect
+
+# Deployments configuration
+# These are template deployments - configure as needed for your environment
+deployments:
+- name: metadata-cpu
+  description: "CPU-based metadata extraction pipeline"
+  entrypoint: ./flows/metadata_cpu.py:generate_gpt_metadata_flow
+  parameters: {}
+  work_pool:
+    name: cpu-agents
+    work_queue_name:
+    job_variables: {}
+
+- name: metadata-gpu
+  description: "GPU-accelerated metadata extraction pipeline"
+  entrypoint: ./flows/metadata_gpu.py:generate_gpu_metadata_flow
+  parameters: {}
+  work_pool:
+    name: gpu-agents
+    work_queue_name:
+    job_variables: {}
+
+- name: transcription
+  description: "Audio/video transcription pipeline"
+  entrypoint: ./flows/transcription.py:transcription_flow
+  parameters: {}
+  work_pool:
+    name: gpu-agents
+    work_queue_name:
+    job_variables: {}
+
+- name: arweave-blocks
+  description: "Arweave block data ingestion"
+  entrypoint: ./flows/blocks.py:get_arweave_blocks
+  parameters: {}
+  work_pool:
+    name: cpu-agents
+    work_queue_name:
+    job_variables: {}

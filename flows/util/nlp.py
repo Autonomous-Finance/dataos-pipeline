@@ -1,0 +1,66 @@
+import os
+
+import spacy
+import spacy_transformers
+from thefuzz import fuzz
+from thefuzz import process
+import numpy as np
+from transformers import AutoTokenizer, AutoModelForTokenClassification
+from transformers import pipeline
+from typing import List, Dict
+
+
+os.system("python3 -m spacy download en_core_web_sm --quiet")
+os.system("python3 -m spacy download en_core_web_lg --quiet")
+# os.system("python3 -m spacy download en_core_web_trf --quiet")
+
+if os.environ.get("FORCE_GPU", "no").lower() == 'yes':
+    spacy.require_gpu()
+else:
+    spacy.prefer_gpu()
+
+# spacy_nlp_trf = spacy.load("en_core_web_trf")
+spacy_nlp_lg = spacy.load("en_core_web_lg")
+
+
+ENT_TYPES = (
+    'PERSON',
+    'NORP',
+    'FAC',
+    'ORG',
+    'GPE',
+    'LOC',
+    'PRODUCT',
+    'EVENT',
+    'WORK_OF_ART',
+    'LAW',
+    'LANGUAGE'
+)
+
+
+def extract_spacy_entities(text: str, ent_types=ENT_TYPES) -> Dict[str, List]:
+    entities = {}
+    # doc = spacy_nlp_trf(text)
+    doc = spacy_nlp_lg(text)
+    for ent in doc.ents:
+        if ent.label_ in ent_types:
+            if ent.label_ not in entities:
+                entities[ent.label_] = []
+            if ent.text not in entities[ent.label_]:
+                entities[ent.label_].append(ent.text)
+
+    return entities
+
+
+def match_keywords(words_1: List[str], words_2: List[str], fuzz_treshold: int = 90) -> int:
+    num_matches = 0
+    for word_1 in words_1:
+        for word_2 in words_2:
+            if fuzz.ratio(word_1, word_2) > fuzz_treshold:
+                num_matches += 1
+    return num_matches
+
+
+def cosine_similarity(a, b) -> float:
+    return np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b))
+

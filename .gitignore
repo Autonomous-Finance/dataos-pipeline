@@ -1,0 +1,81 @@
+# Environment and secrets
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual environments
+venv/
+ENV/
+env/
+.venv/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Keys and credentials
+*.pem
+*.key
+privkey
+pubkey
+*.crt
+*.cer
+
+# Logs
+*.log
+logs/
+
+# Data and cache
+*.csv
+*.json
+!flows/util/datasets/*.json
+data/
+cache/
+videos_etl/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Pipenv
+Pipfile.lock
+
+# Docker
+docker-compose.override.yml
+
+# Test artifacts
+test
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Prefect
+.prefect/

@@ -1,0 +1,49 @@
+# Environment and secrets
+.env
+.env.*
+!.env.example
+
+# Git
+.git/
+.gitignore
+
+# IDE
+.idea/
+.vscode/
+*.swp
+
+# Python cache
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+dist/
+build/
+
+# Virtual environments
+venv/
+.venv/
+env/
+
+# Documentation
+*.md
+!README.md
+docs/
+
+# Tests
+tests/
+test/
+pytest.ini
+.coverage
+
+# Docker
+docker-compose*.yml
+Dockerfile*
+!Dockerfile
+
+# Misc
+.DS_Store
+*.log
+data/
+videos_etl/
+.prefect/
